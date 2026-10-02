@@ -55,11 +55,24 @@ writes to the clipboard.
 
 ## Development
 
+The code is strict TypeScript, compiled with `tsc` into `out/` (the Electron
+entry point is `out/src/main/main.js`).
+
 ```bash
 npm install
-npm start          # run the app
-npm test           # unit tests (node:test)
+npm start          # build and run the app
+npm test           # build and run unit tests (node:test)
+npm run typecheck  # type-check without emitting
+npm run build      # compile into out/ and copy HTML/CSS assets
 ```
+
+There are two TypeScript projects. `tsconfig.json` covers the main process,
+the preload and the tests, with Node types and no DOM. The settings page
+(`src/settings/renderer/`) has its own `tsconfig.json` with DOM types. It is
+compiled as a classic script, because the sandboxed page cannot load
+CommonJS modules. Types shared across the IPC boundary live in
+`src/shared/settings-api.ts`, and only type imports may be used from there.
+The sandboxed preload can only `require('electron')`.
 
 `CTO_USER_DATA=/some/dir npm start` runs with a separate settings directory.
 
