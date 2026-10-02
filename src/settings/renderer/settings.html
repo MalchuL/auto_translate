@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'">
+  <title>Настройки — Clipboard Translate Overlay</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <form id="form" novalidate>
+    <header>
+      <h1>Настройки</h1>
+      <p class="hint">Скопированный текст хранится только в памяти и никогда не записывается на диск.</p>
+    </header>
+
+    <section>
+      <label class="field">
+        <span>Целевой язык</span>
+        <select name="targetLanguage" id="targetLanguage"></select>
+      </label>
+
+      <label class="field">
+        <span>Глобальный хоткей</span>
+        <input name="hotkey" id="hotkey" type="text" spellcheck="false" placeholder="CommandOrControl+Shift+Y">
+        <small>Нажмите сочетание клавиш в поле. Пустое значение отключает хоткей.</small>
+      </label>
+    </section>
+
+    <section>
+      <label class="check"><input type="checkbox" name="showOnNewText"> Показывать окно при новом тексте</label>
+      <label class="check"><input type="checkbox" name="alwaysOnTop"> Поверх всех окон (Always on Top)</label>
+      <label class="check"><input type="checkbox" name="launchAtLogin"> Запускать вместе с системой</label>
+      <label class="check"><input type="checkbox" name="allowHtmlFallback"> Использовать text/html, если нет text/plain</label>
+    </section>
+
+    <section class="row">
+      <label class="field">
+        <span>Интервал проверки, мс</span>
+        <input name="pollIntervalMs" id="pollIntervalMs" type="number" step="50" required>
+      </label>
+      <label class="field">
+        <span>Макс. длина текста</span>
+        <input name="maxTextLength" id="maxTextLength" type="number" step="100" required>
+      </label>
+    </section>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <footer>
+      <button type="button" id="cancel">Закрыть</button>
+      <button type="submit" class="primary">Сохранить</button>
+    </footer>
+  </form>
+  <script src="settings.js"></script>
+</body>
+</html>

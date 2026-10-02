@@ -1,0 +1,13 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "../../..",
+    "outDir": "../../../out",
+    "lib": ["es2023", "dom"],
+    // settings.ts is a classic browser script; emitting CommonJS module
+    // boilerplate (`exports`) would throw in the page.
+    "moduleDetection": "auto",
+    "types": []
+  },
+  "include": ["*.ts"]
+}
