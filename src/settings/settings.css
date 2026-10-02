@@ -1,0 +1,59 @@
+:root {
+  color-scheme: light dark;
+  --accent: #1a73e8;
+  --border: color-mix(in srgb, CanvasText 18%, transparent);
+  --muted: color-mix(in srgb, CanvasText 60%, transparent);
+  font-family: system-ui, -apple-system, "Segoe UI", Ubuntu, sans-serif;
+  font-size: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; background: Canvas; color: CanvasText; }
+
+form { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+
+h1 { margin: 0 0 4px; font-size: 20px; }
+
+.hint, small { color: var(--muted); margin: 0; font-size: 12px; }
+
+section { display: flex; flex-direction: column; gap: 10px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+
+.row { flex-direction: row; gap: 12px; }
+.row .field { flex: 1; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field > span { font-weight: 600; }
+
+.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+input[type="text"], input[type="number"], select {
+  font: inherit;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: Field;
+  color: FieldText;
+}
+
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
+
+#status { min-height: 18px; margin: 0; font-size: 13px; }
+#status.ok { color: #2ea043; }
+#status.error { color: #da3633; }
+
+footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+button {
+  font: inherit;
+  padding: 7px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: ButtonFace;
+  color: ButtonText;
+  cursor: pointer;
+}
+
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }

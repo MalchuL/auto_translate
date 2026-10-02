@@ -1,0 +1,50 @@
+{
+  "name": "clipboard-translate-overlay",
+  "productName": "Clipboard Translate Overlay",
+  "version": "0.1.0",
+  "description": "Shows Google Translate for the clipboard text in a compact always-on-top window",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "dist:linux": "electron-builder --linux deb AppImage",
+    "dist:mac": "electron-builder --mac dmg zip"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MalchuL/auto_translate.git"
+  },
+  "author": "MalchuL",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MalchuL/auto_translate/issues"
+  },
+  "homepage": "https://github.com/MalchuL/auto_translate#readme",
+  "devDependencies": {
+    "electron": "^44.5.1"
+  },
+  "build": {
+    "appId": "com.malchul.clipboard-translate-overlay",
+    "productName": "Clipboard Translate Overlay",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "extendInfo": {
+        "LSUIElement": true
+      }
+    },
+    "linux": {
+      "category": "Utility",
+      "target": [
+        "deb",
+        "AppImage"
+      ],
+      "executableArgs": [
+        "--ozone-platform=x11"
+      ]
+    }
+  }
+}
