@@ -1,8 +1,10 @@
-'use strict';
+import { nativeImage, type NativeImage } from 'electron';
 
-const { nativeImage } = require('electron');
+export type TrayState = 'active' | 'loading' | 'paused' | 'error';
 
-const COLORS = {
+type Rgb = readonly [number, number, number];
+
+const COLORS: Readonly<Record<TrayState, Rgb>> = {
   active: [46, 160, 67],
   loading: [219, 154, 4],
   paused: [140, 140, 140],
@@ -10,7 +12,7 @@ const COLORS = {
 };
 
 // Draws a filled disc with a white "T" glyph into a BGRA bitmap.
-function drawIcon(size, [r, g, b]) {
+export function drawIcon(size: number, [r, g, b]: Rgb): Buffer {
   const buffer = Buffer.alloc(size * size * 4);
   const center = (size - 1) / 2;
   const radius = size / 2 - 0.5;
@@ -38,20 +40,18 @@ function drawIcon(size, [r, g, b]) {
   return buffer;
 }
 
-const cache = new Map();
+const cache = new Map<TrayState, NativeImage>();
 
-function trayIcon(state) {
-  const key = COLORS[state] ? state : 'active';
-  if (!cache.has(key)) {
-    const image = nativeImage.createFromBitmap(drawIcon(16, COLORS[key]), { width: 16, height: 16, scaleFactor: 1 });
-    image.addRepresentation({ scaleFactor: 2, width: 32, height: 32, buffer: drawIcon(32, COLORS[key]) });
-    cache.set(key, image);
+export function trayIcon(state: TrayState): NativeImage {
+  let image = cache.get(state);
+  if (!image) {
+    image = nativeImage.createFromBitmap(drawIcon(16, COLORS[state]), { width: 16, height: 16, scaleFactor: 1 });
+    image.addRepresentation({ scaleFactor: 2, width: 32, height: 32, buffer: drawIcon(32, COLORS[state]) });
+    cache.set(state, image);
   }
-  return cache.get(key);
+  return image;
 }
 
-function appIcon() {
+export function appIcon(): NativeImage {
   return nativeImage.createFromBitmap(drawIcon(128, COLORS.active), { width: 128, height: 128 });
 }
-
-module.exports = { trayIcon, appIcon, drawIcon };

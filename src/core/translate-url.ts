@@ -1,10 +1,8 @@
-'use strict';
-
 const TRANSLATE_ORIGIN = 'https://translate.google.com';
 
-const ALLOWED_HOSTS = new Set(['translate.google.com', 'consent.google.com']);
+export const ALLOWED_HOSTS: ReadonlySet<string> = new Set(['translate.google.com', 'consent.google.com']);
 
-function buildTranslateUrl(text, targetLanguage) {
+export function buildTranslateUrl(text: string, targetLanguage: string): string {
   const params = new URLSearchParams({
     sl: 'auto',
     tl: targetLanguage,
@@ -16,8 +14,8 @@ function buildTranslateUrl(text, targetLanguage) {
   return `${TRANSLATE_ORIGIN}/?${params.toString().replace(/\+/g, '%20')}`;
 }
 
-function isAllowedTranslatorUrl(rawUrl) {
-  let url;
+export function isAllowedTranslatorUrl(rawUrl: string): boolean {
+  let url: URL;
   try {
     url = new URL(rawUrl);
   } catch {
@@ -27,7 +25,7 @@ function isAllowedTranslatorUrl(rawUrl) {
   return url.protocol === 'https:' && ALLOWED_HOSTS.has(url.hostname);
 }
 
-function isExternalWebUrl(rawUrl) {
+export function isExternalWebUrl(rawUrl: string): boolean {
   try {
     const { protocol } = new URL(rawUrl);
     return protocol === 'https:' || protocol === 'http:';
@@ -35,5 +33,3 @@ function isExternalWebUrl(rawUrl) {
     return false;
   }
 }
-
-module.exports = { buildTranslateUrl, isAllowedTranslatorUrl, isExternalWebUrl, ALLOWED_HOSTS };

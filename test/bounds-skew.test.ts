@@ -1,9 +1,7 @@
-'use strict';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const test = require('node:test');
-const assert = require('node:assert/strict');
-
-const { measureSkew, removeSkew } = require('../src/core/bounds-skew');
+import { measureSkew, removeSkew } from '../src/core/bounds-skew';
 
 test('skew measured after show is removed before saving', () => {
   const requested = { x: 200, y: 150, width: 600, height: 450 };

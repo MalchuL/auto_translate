@@ -3,12 +3,14 @@
   "productName": "Clipboard Translate Overlay",
   "version": "0.1.0",
   "description": "Shows Google Translate for the clipboard text in a compact always-on-top window",
-  "main": "src/main/main.js",
+  "main": "out/src/main/main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "node --test test/*.test.js",
-    "dist:linux": "electron-builder --linux deb AppImage",
-    "dist:mac": "electron-builder --mac dmg zip"
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p src/settings/renderer/tsconfig.json --noEmit",
+    "start": "npm run build && electron .",
+    "test": "npm run build && node --test out/test/*.test.js",
+    "dist:linux": "npm run build && electron-builder --linux deb AppImage",
+    "dist:mac": "npm run build && electron-builder --mac dmg zip"
   },
   "repository": {
     "type": "git",
@@ -21,14 +23,16 @@
   },
   "homepage": "https://github.com/MalchuL/auto_translate#readme",
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "electron": "^44.5.1",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "typescript": "^7.0.2"
   },
   "build": {
     "appId": "com.malchul.clipboard-translate-overlay",
     "productName": "Clipboard Translate Overlay",
     "files": [
-      "src/**/*",
+      "out/src/**/*",
       "package.json"
     ],
     "mac": {

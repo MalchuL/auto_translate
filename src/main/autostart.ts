@@ -1,33 +1,31 @@
-'use strict';
-
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { app } = require('electron');
-const log = require('./log');
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { app } from 'electron';
+import * as log from './log';
 
 const DESKTOP_FILE = 'clipboard-translate-overlay.desktop';
 
-function linuxAutostartPath() {
+export function linuxAutostartPath(): string {
   const configHome = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config');
   return path.join(configHome, 'autostart', DESKTOP_FILE);
 }
 
-function quote(arg) {
-  return `"${String(arg).replace(/(["`$\\])/g, '\\$1')}"`;
+function quote(arg: string): string {
+  return `"${arg.replace(/(["`$\\])/g, '\\$1')}"`;
 }
 
-function linuxExecLine() {
+function linuxExecLine(): string {
   if (process.env.APPIMAGE) return quote(process.env.APPIMAGE);
   const args = [process.execPath];
   if (!app.isPackaged) args.push(app.getAppPath());
   return args.map(quote).join(' ');
 }
 
-function setLaunchAtLogin(enabled) {
+export function setLaunchAtLogin(enabled: boolean): void {
   try {
     if (process.platform !== 'linux') {
-      app.setLoginItemSettings({ openAtLogin: enabled, openAsHidden: true });
+      app.setLoginItemSettings({ openAtLogin: enabled });
       return;
     }
     const file = linuxAutostartPath();
@@ -50,8 +48,6 @@ function setLaunchAtLogin(enabled) {
       'utf8',
     );
   } catch (error) {
-    log.warn(`autostart: failed to update (${error.code || error.message})`);
+    log.warn(`autostart: failed to update (${log.errorCode(error)})`);
   }
 }
-
-module.exports = { setLaunchAtLogin, linuxAutostartPath };

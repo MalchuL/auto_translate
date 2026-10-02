@@ -1,6 +1,9 @@
-'use strict';
+export interface Language {
+  readonly code: string;
+  readonly name: string;
+}
 
-const LANGUAGES = [
+export const LANGUAGES: readonly Language[] = [
   { code: 'ru', name: 'Русский' },
   { code: 'en', name: 'English' },
   { code: 'uk', name: 'Українська' },
@@ -18,6 +21,4 @@ const LANGUAGES = [
   { code: 'hi', name: 'हिन्दी' },
 ];
 
-const LANGUAGE_CODES = new Set(LANGUAGES.map((l) => l.code));
-
-module.exports = { LANGUAGES, LANGUAGE_CODES };
+export const LANGUAGE_CODES: ReadonlySet<string> = new Set(LANGUAGES.map((l) => l.code));

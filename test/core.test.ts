@@ -1,12 +1,10 @@
-'use strict';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const test = require('node:test');
-const assert = require('node:assert/strict');
-
-const { normalizeText, htmlToPlainText } = require('../src/core/text');
-const { classifyFormats } = require('../src/core/formats');
-const { buildTranslateUrl, isAllowedTranslatorUrl } = require('../src/core/translate-url');
-const { sanitizeSettings, DEFAULT_SETTINGS } = require('../src/core/settings-schema');
+import { normalizeText, htmlToPlainText } from '../src/core/text';
+import { classifyFormats } from '../src/core/formats';
+import { buildTranslateUrl, isAllowedTranslatorUrl } from '../src/core/translate-url';
+import { sanitizeSettings, DEFAULT_SETTINGS } from '../src/core/settings-schema';
 
 test('normalizeText trims outer whitespace and unifies line endings only', () => {
   assert.equal(normalizeText('  hello  world \r\nnext\rline\n\n'), 'hello  world \nnext\nline');
@@ -39,7 +37,7 @@ test('classifyFormats rejects images, files and custom types', () => {
 });
 
 test('classifyFormats understands Electron raw OS format entries', () => {
-  const raw = (name) => `electron application/osclipboard;format="${name}"`;
+  const raw = (name: string): string => `electron application/osclipboard;format="${name}"`;
   assert.equal(classifyFormats(['text/plain', raw('TARGETS'), raw('UTF8_STRING')]).kind, 'plain');
   assert.equal(classifyFormats([raw('TARGETS')]).reason, 'empty');
   assert.equal(classifyFormats(['text/plain', raw('public.file-url')]).reason, 'files');

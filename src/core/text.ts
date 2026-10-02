@@ -1,11 +1,9 @@
-'use strict';
-
-function normalizeText(value) {
+export function normalizeText(value: unknown): string {
   if (typeof value !== 'string') return '';
   return value.replace(/\r\n?/g, '\n').trim();
 }
 
-const NAMED_ENTITIES = {
+const NAMED_ENTITIES: Readonly<Record<string, string>> = {
   amp: '&',
   lt: '<',
   gt: '>',
@@ -14,10 +12,10 @@ const NAMED_ENTITIES = {
   nbsp: ' ',
 };
 
-function decodeEntities(value) {
-  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+function decodeEntities(value: string): string {
+  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity: string) => {
     if (entity[0] === '#') {
-      const code = entity[1].toLowerCase() === 'x'
+      const code = entity[1]?.toLowerCase() === 'x'
         ? parseInt(entity.slice(2), 16)
         : parseInt(entity.slice(1), 10);
       if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return match;
@@ -27,12 +25,11 @@ function decodeEntities(value) {
         return match;
       }
     }
-    const named = NAMED_ENTITIES[entity.toLowerCase()];
-    return named === undefined ? match : named;
+    return NAMED_ENTITIES[entity.toLowerCase()] ?? match;
   });
 }
 
-function htmlToPlainText(html) {
+export function htmlToPlainText(html: unknown): string {
   if (typeof html !== 'string' || html.length === 0) return '';
   const text = html
     .replace(/<!--[\s\S]*?-->/g, '')
@@ -44,5 +41,3 @@ function htmlToPlainText(html) {
     .replace(/\n{3,}/g, '\n\n');
   return decodeEntities(text);
 }
-
-module.exports = { normalizeText, htmlToPlainText };

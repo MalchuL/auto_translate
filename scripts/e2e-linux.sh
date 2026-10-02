@@ -49,6 +49,7 @@ cleanup() {
 trap cleanup EXIT
 [ -n "${CTO_E2E_DEBUG:-}" ] && trap 'cat "$LOG" | grep cto; cat "$UD/userdata/settings.json"; cleanup' EXIT
 
+node "$ROOT/scripts/build.mjs" || exit 1
 echo "Clipboard Translate Overlay — Linux e2e (user data: $UD)"
 
 copy_text "pre-existing $TOKEN" 0.2

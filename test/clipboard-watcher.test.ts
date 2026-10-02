@@ -1,12 +1,18 @@
-'use strict';
+import test from 'node:test';
+import assert from 'node:assert/strict';
 
-const test = require('node:test');
-const assert = require('node:assert/strict');
+import { ClipboardWatcher, type Rejection, type Timers, type WatcherOptions } from '../src/core/clipboard-watcher';
 
-const { ClipboardWatcher } = require('../src/core/clipboard-watcher');
+interface FakeClipboard {
+  formats: string[];
+  text: string;
+  html: string;
+  throwOnRead: boolean;
+  reads: number;
+}
 
 function createHarness({ maxTextLength = 100, allowHtmlFallback = false } = {}) {
-  const clip = { formats: [], text: '', html: '', throwOnRead: false, reads: 0 };
+  const clip: FakeClipboard = { formats: [], text: '', html: '', throwOnRead: false, reads: 0 };
   const clipboard = {
     async snapshot() {
       if (clip.throwOnRead) throw new Error('boom');
@@ -17,24 +23,24 @@ function createHarness({ maxTextLength = 100, allowHtmlFallback = false } = {}) 
       };
     },
   };
-  const sent = [];
-  const rejected = [];
-  const errors = [];
-  const pending = new Map();
+  const sent: string[] = [];
+  const rejected: Rejection[] = [];
+  const errors: unknown[] = [];
+  const pending = new Map<number, () => unknown>();
   let nextId = 1;
-  const timers = {
+  const timers: Timers = {
     setTimeout(fn) {
       const id = nextId++;
       pending.set(id, fn);
       return id;
     },
     clearTimeout(id) {
-      pending.delete(id);
+      pending.delete(id as number);
     },
     setInterval: () => 0,
     clearInterval() {},
   };
-  const options = { maxTextLength, allowHtmlFallback };
+  const options: WatcherOptions = { maxTextLength, allowHtmlFallback };
   const watcher = new ClipboardWatcher({
     clipboard,
     getOptions: () => options,
@@ -43,16 +49,16 @@ function createHarness({ maxTextLength = 100, allowHtmlFallback = false } = {}) 
     onReadError: (e) => errors.push(e),
     timers,
   });
-  const flushTimers = async () => {
+  const flushTimers = async (): Promise<void> => {
     const fns = [...pending.values()];
     pending.clear();
     await Promise.all(fns.map((fn) => fn()));
   };
-  const copyText = (text) => {
+  const copyText = (text: string): void => {
     clip.formats = ['text/plain'];
     clip.text = text;
   };
-  const step = async () => {
+  const step = async (): Promise<void> => {
     await watcher.tick();
     await flushTimers();
   };
