@@ -4,10 +4,12 @@ const path = require('node:path');
 const { BrowserWindow, net, screen, session, shell } = require('electron');
 const { WINDOW_DEFAULTS } = require('../core/settings-schema');
 const { buildTranslateUrl, isAllowedTranslatorUrl, isExternalWebUrl } = require('../core/translate-url');
+const { measureSkew, removeSkew } = require('../core/bounds-skew');
 const log = require('./log');
 
 const ERROR_PAGE = path.join(__dirname, '..', 'pages', 'error.html');
 const RETRY_DELAY_MS = 1500;
+const SKEW_SETTLE_MS = 400;
 const ERR_ABORTED = -3;
 const OFFLINE_ERRORS = new Set([-106, -105, -21, -137]);
 const WINDOW_TITLE = 'Clipboard Translate Overlay';
@@ -52,11 +54,16 @@ class TranslatorWindow {
     const saved = settings.windowBounds;
     const bounds = saved && boundsAreVisible(saved) ? saved : { width: WINDOW_DEFAULTS.width, height: WINDOW_DEFAULTS.height };
 
+    this.requestedBounds = bounds;
+    this.skew = null;
+
     const ses = session.fromPartition(PARTITION);
     hardenSession(ses);
 
     this.win = new BrowserWindow({
       ...bounds,
+      // Width/height are the page size; frame extents differ between window managers.
+      useContentSize: true,
       minWidth: WINDOW_DEFAULTS.minWidth,
       minHeight: WINDOW_DEFAULTS.minHeight,
       show: false,
@@ -120,11 +127,21 @@ class TranslatorWindow {
       this.hide();
     });
 
-    const emitBounds = () => {
-      if (!win.isMinimized() && !win.isMaximized() && !win.isFullScreen()) {
-        this.onBoundsChanged(win.getNormalBounds());
-      }
+    const currentBounds = () => {
+      const [x, y] = win.getPosition();
+      const [width, height] = win.getContentSize();
+      return { x, y, width, height };
     };
+    const emitBounds = () => {
+      if (this.skew === null || win.isMinimized() || win.isMaximized() || win.isFullScreen()) return;
+      this.onBoundsChanged(removeSkew(currentBounds(), this.skew));
+    };
+    win.once('show', () => {
+      setTimeout(() => {
+        if (win.isDestroyed()) return;
+        this.skew = measureSkew(this.requestedBounds, currentBounds());
+      }, SKEW_SETTLE_MS);
+    });
     win.on('resize', emitBounds);
     win.on('move', emitBounds);
     win.on('show', () => this.onVisibilityChanged(true));
