@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/MalchuL/auto_translate#readme",
   "devDependencies": {
-    "electron": "^44.5.1"
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
   },
   "build": {
     "appId": "com.malchul.clipboard-translate-overlay",
@@ -38,6 +39,7 @@
     },
     "linux": {
       "category": "Utility",
+      "maintainer": "MalchuL <MalchuL@users.noreply.github.com>",
       "target": [
         "deb",
         "AppImage"

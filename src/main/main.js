@@ -202,10 +202,13 @@ function openSettings() {
   }
   settingsWindow = new BrowserWindow({
     width: 480,
-    height: 620,
+    height: 600,
+    useContentSize: true,
     resizable: false,
     minimizable: false,
     maximizable: false,
+    // Otherwise it opens underneath the always-on-top translator window.
+    alwaysOnTop: true,
     title: `Настройки — ${APP_NAME}`,
     icon: appIcon(),
     autoHideMenuBar: true,
