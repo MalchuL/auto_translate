@@ -78,7 +78,7 @@ The sandboxed preload can only `require('electron')`.
 
 ### End-to-end check (Linux/X11)
 
-`scripts/e2e-linux.sh` starts the real app and drives it with `xclip`/`xdotool`
+`scripts/e2e-linux.sh` builds and starts the real app and drives it with `xclip`/`xdotool`
 (needs `xclip`, `xdotool`, `xprop`, `xwininfo` and `xmessage`). It checks: new
 text is translated; repeated, image, file, HTML-only and custom-type clipboard
 content is ignored; the length limit; focus is not stolen; always on top;
@@ -104,8 +104,9 @@ and no Dock icon.
 ```text
 src/core/     platform-independent logic (watcher, MIME filter, URL, settings schema)
 src/main/     Electron main process (app lifecycle, tray, translator window, settings store)
-src/settings/ settings window (sandboxed renderer + preload)
+src/settings/ settings window: preload.ts and renderer/ (page, styles, script)
+src/shared/   type-only contracts shared by main, preload and renderer
 src/pages/    local error page for the translator window
 test/         unit tests
-scripts/      end-to-end check for Linux
+scripts/      build script and end-to-end check for Linux
 ```
