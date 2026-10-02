@@ -29,9 +29,10 @@ wait_for_log() {
 
 start_app() {
   : >"$LOG"
-  setsid env CTO_USER_DATA="$UD/userdata" "$ROOT/node_modules/.bin/electron" "$ROOT" >"$LOG" 2>&1 &
+  setsid env CTO_USER_DATA="$UD/userdata" "$ROOT/node_modules/.bin/electron" "$ROOT" "$@" >"$LOG" 2>&1 &
   APP_PGID=$!
   wait_for_log 'ready (' || { echo "app did not start"; cat "$LOG"; exit 1; }
+  sleep 0.5
 }
 
 stop_app() {
@@ -122,6 +123,14 @@ for round in 1 2; do
   check "position and size restored after restart #$round ($GEOMETRY_BEFORE -> $GEOMETRY_AFTER)" \
     'same_geometry "$GEOMETRY_BEFORE" "$GEOMETRY_AFTER"'
 done
+
+stop_app
+start_app --host-resolver-rules="MAP translate.google.com ~NOTFOUND"
+copy_text "Unreachable translate $RANDOM" 6
+check "unreachable Google Translate is retried exactly once" '[ "$(count "load failed")" -eq 2 ]'
+check "error state is reported after the retry" 'grep -qE "translator: (offline|error)" "$LOG"'
+copy_text "Another text after the error $RANDOM" 6
+check "new clipboard text starts a new load attempt" '[ "$(count "load failed")" -eq 4 ]'
 
 echo
 if [ "$FAILURES" -eq 0 ]; then echo "All checks passed"; else echo "$FAILURES check(s) failed"; fi

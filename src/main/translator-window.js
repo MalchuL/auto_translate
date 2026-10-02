@@ -44,6 +44,7 @@ class TranslatorWindow {
     this.currentText = null;
     this.requestId = 0;
     this.attempt = 0;
+    this.loadFailed = false;
     this.retryTimer = null;
     this.status = 'idle';
   }
@@ -147,14 +148,13 @@ class TranslatorWindow {
     win.on('show', () => this.onVisibilityChanged(true));
     win.on('hide', () => this.onVisibilityChanged(false));
 
+    // Chromium fires did-finish-load for its own error page after a failure.
     wc.on('did-finish-load', () => {
-      if (this.isTranslatePage()) {
-        this.attempt = 0;
-        this.setStatus('ready');
-      }
+      if (!this.loadFailed && this.isTranslatePage()) this.setStatus('ready');
     });
     wc.on('did-fail-load', (_event, errorCode, _description, _url, isMainFrame) => {
       if (!isMainFrame || errorCode === ERR_ABORTED) return;
+      this.loadFailed = true;
       this.handleLoadFailure(errorCode);
     });
     wc.on('render-process-gone', () => this.handleLoadFailure(-2));
@@ -193,6 +193,7 @@ class TranslatorWindow {
 
   load() {
     this.create();
+    this.loadFailed = false;
     this.setStatus('loading', { retry: this.attempt > 0 });
     this.win.loadURL(this.url()).catch(() => {});
   }
@@ -211,6 +212,7 @@ class TranslatorWindow {
     if (!this.win || this.win.isDestroyed()) return;
     this.requestId += 1;
     this.attempt = 0;
+    clearTimeout(this.retryTimer);
     this.load();
   }
 
